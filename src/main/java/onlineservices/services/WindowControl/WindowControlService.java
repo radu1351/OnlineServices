@@ -1,4 +1,4 @@
-package services.WindowControl;
+package onlineservices.services.WindowControl;
 
 import onlineservices.Service;
 
