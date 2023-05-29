@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+        <Appenders>
+            <RollingFile name="RollingFile" fileName="projectLogs.txt" filePattern="projectLogs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.txt.gz">
+                <PatternLayout>
+                    <Pattern>%d{dd:MM:yyyy - HH:mm:ss.SSS} %-3p %c{2} [%t] - %m%n </Pattern>
+                </PatternLayout>
+                <Policies>
+                    <SizeBasedTriggeringPolicy size="10KB"/>
+                </Policies>
+            </RollingFile>
+        </Appenders>
+        <Loggers>
+            <Logger name="l1" level="error" additivity="false">
+                <AppenderRef ref="RollingFile"/>
+            </Logger>
+            <Root level="trace">
+                <AppenderRef ref="RollingFile"/>
+            </Root>
+        </Loggers>
+</Configuration>
