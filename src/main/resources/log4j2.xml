@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
         <Appenders>
-            <RollingFile name="RollingFile" fileName="projectLogs.txt" filePattern="projectLogs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.txt.gz">
+            <RollingFile name="RollingFile" fileName="projectLogs.txt" filePattern="projectLogs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.txt">
                 <PatternLayout>
                     <Pattern>%d{dd:MM:yyyy - HH:mm:ss.SSS} %-3p %c{2} [%t] - %m%n </Pattern>
                 </PatternLayout>
