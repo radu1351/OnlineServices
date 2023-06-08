@@ -1,8 +1,8 @@
 package onlineservices.services.WindowControl;
 
-import onlineservices.Service;
+import onlineservices.OnlineService;
 
-public class WindowControlService implements Service {
+public class WindowControlService implements OnlineService {
 
     @Override
     public void onCreate() {

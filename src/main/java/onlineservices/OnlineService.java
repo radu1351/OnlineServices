@@ -1,6 +1,6 @@
 package onlineservices;
 
-public interface Service {
+public interface OnlineService {
     void onCreate();
     void onDestroy();
 }
