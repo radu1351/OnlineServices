@@ -6,6 +6,7 @@
     <artifactId>OnlineServices</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
     <name>OnlineServices</name>
     <url>http://maven.apache.org</url>
 
