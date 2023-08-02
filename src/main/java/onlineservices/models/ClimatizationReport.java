@@ -2,14 +2,14 @@ package onlineservices.models;
 
 import java.util.Date;
 
-public class Report {
+public class ClimatizationReport {
     private static short numberOfReports = 0;
     private short id;
     private Date date;
     private short power;
     private short actionCode;
 
-    public Report(Date date, short power, short action) {
+    public ClimatizationReport(Date date, short power, short action) {
         this.id = ++numberOfReports;
         this.date = date;
         this.power = power;
@@ -21,7 +21,7 @@ public class Report {
     }
 
     public static void setNumberOfReports(short numberOfReports) {
-        Report.numberOfReports = numberOfReports;
+        ClimatizationReport.numberOfReports = numberOfReports;
     }
 
     public short getId() {
@@ -58,7 +58,7 @@ public class Report {
 
     @Override
     public String toString() {
-        return "RaportID: " + id + "\nDate: " + date +
+        return "ReportID: " + id + "\nDate: " + date +
                 "\nAir Conditioning Power: " + power + "\nAction Code: " + actionCode;
     }
 }

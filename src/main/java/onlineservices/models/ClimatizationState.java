@@ -1,4 +1,4 @@
-package onlineservices;
+package onlineservices.models;
 
 public enum ClimatizationState {
     OFF,

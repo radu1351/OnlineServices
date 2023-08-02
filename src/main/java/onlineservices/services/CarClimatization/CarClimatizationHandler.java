@@ -1,7 +1,7 @@
 package onlineservices.services.CarClimatization;
 
-import onlineservices.ClimatizationState;
-import onlineservices.models.Report;
+import onlineservices.models.ClimatizationState;
+import onlineservices.models.ClimatizationReport;
 import onlineservices.utils.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,7 @@ public class CarClimatizationHandler {
                 } else {
                     int difference = setTemperature - lastMinuteTemperature.get(3);
                     if (difference >= 0) {
-                        //Temparture decreeased => start heating
+                        //Temperature decreased => start heating
                         if (difference == 0) climatizationState = ClimatizationState.HEATING_0;
                         if (difference > 0 && difference <= 2) climatizationState = ClimatizationState.HEATING_1;
                         if (difference >= 3 && difference <= 4) climatizationState = ClimatizationState.HEATING_2;
@@ -52,12 +52,12 @@ public class CarClimatizationHandler {
                         LOGGER.info("Cooling ON - Level: " + climatizationState);
                     }
                 }
-                Report report = new Report(new Date(),
+                ClimatizationReport climatizationReport = new ClimatizationReport(new Date(),
                         Short.valueOf(climatizationState.equals(ClimatizationState.OFF) ? "-1"
                                 : climatizationState.toString().substring(climatizationState.toString().length() - 1)),
                         (short) (climatizationState.toString().contains("OFF") ? 0
                                 : climatizationState.toString().contains("HEATING") ? 1 : 0));
-                System.out.println(report.toString());
+                System.out.println(climatizationReport);
                 lastMinuteTemperature.clear();
             }
         }

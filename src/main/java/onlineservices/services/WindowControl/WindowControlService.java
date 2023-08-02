@@ -1,8 +1,7 @@
 package onlineservices.services.WindowControl;
 
-import onlineservices.handlers.MqttClientHandler;
-import onlineservices.OnlineService;
-import org.apache.logging.log4j.Level;
+import onlineservices.mqtt.MqttClientHandler;
+import onlineservices.services.OnlineService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -29,7 +28,7 @@ public class WindowControlService implements OnlineService {
     @Override
     public void onDestroy() {
         try {
-            mqttClientHandler.unsubcribeFromTopic(MQTT_WINDOW_SERVICE_TOPIC);
+            mqttClientHandler.unsubscribeFromTopic(MQTT_WINDOW_SERVICE_TOPIC);
             mqttClientHandler.disconnect();
         } catch (MqttException exception) {
             LOGGER.error("Error closing WindowControlService MQTT Client", exception);

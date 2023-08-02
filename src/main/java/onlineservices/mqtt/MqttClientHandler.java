@@ -1,6 +1,5 @@
-package onlineservices.handlers;
+package onlineservices.mqtt;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -39,7 +38,7 @@ public class MqttClientHandler {
         LOGGER.info(String.format("Subscribed %1$s to %2$s topic.", mqttClient.getClientId(), topic));
     }
 
-    public void unsubcribeFromTopic(String topic) throws MqttException {
+    public void unsubscribeFromTopic(String topic) throws MqttException {
         LOGGER.info(String.format("Unsubscribing %1$s from %2$s topic...", mqttClient.getClientId(), topic));
         mqttClient.unsubscribe(topic);
         LOGGER.info(String.format("Unsubscribed %1$s from %2$s topic.", mqttClient.getClientId(), topic));

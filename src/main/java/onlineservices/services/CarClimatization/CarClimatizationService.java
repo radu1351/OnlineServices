@@ -1,7 +1,7 @@
 package onlineservices.services.CarClimatization;
 
-import onlineservices.OnlineService;
-import onlineservices.handlers.MqttClientHandler;
+import onlineservices.services.OnlineService;
+import onlineservices.mqtt.MqttClientHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -28,7 +28,7 @@ public class CarClimatizationService implements OnlineService {
     @Override
     public void onDestroy() {
         try {
-            mqttClientHandler.unsubcribeFromTopic(MQTT_INSIDE_TEMPERATURE_SENSOR_TOPIC);
+            mqttClientHandler.unsubscribeFromTopic(MQTT_INSIDE_TEMPERATURE_SENSOR_TOPIC);
             mqttClientHandler.disconnect();
         } catch (MqttException exception) {
             LOGGER.error("Error closing CarClimatizationService MQTT Client", exception);
