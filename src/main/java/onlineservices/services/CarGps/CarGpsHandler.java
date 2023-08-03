@@ -15,15 +15,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class CarGpsHandler {
     private static final String startingSignal = "-10000, -10000";
     private static final String endingSignal = "-10001, -10001";
     private static final String sosSignal = "-11111, -11111";
-
     private boolean hasTripStarted = false;
     private List<String> tripCoordinates = new ArrayList<>();
     private Date startTripDate;
@@ -62,6 +59,7 @@ public class CarGpsHandler {
                 sosEmailSent = true;
                 status = Status.SOS;
                 TripReport tripReport = new TripReport(tripCoordinates, startTripDate, lastCoordinatesDate, status, sosEmailSent);
+                sendSosData(lastCoordinates, lastCoordinatesDate);
                 sendTripReport(tripReport);
             }
         } else {
@@ -72,6 +70,53 @@ public class CarGpsHandler {
             }
             sosTrigger = 0;
         }
+    }
+
+    private void sendSosData(String lastCoordinates, Date lastCoordinatesDate) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = null;
+
+        Map<String, Object> sosData = new HashMap<>();
+        sosData.put("lastCoordinates", lastCoordinates);
+        sosData.put("lastCoordinatesDate", lastCoordinatesDate);
+
+        try {
+            jsonString = mapper.writeValueAsString(sosData);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        URL url = new URL("http://localhost:8080/receive_sos_data_from_gps_service");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Content-Length", String.valueOf(jsonString.getBytes(StandardCharsets.UTF_8).length));
+        conn.setDoOutput(true);
+
+        try (OutputStream os = conn.getOutputStream()) {
+            OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
+            osw.write(jsonString);
+            osw.flush();
+        }
+
+        // Check server's response
+        int responseCode = conn.getResponseCode();
+        System.out.println("POST Response Code :: " + responseCode);
+
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response.toString());
+        } else {
+            System.out.println("POST request failed");
+        }
+        conn.disconnect();
     }
 
     private void sendTripReport(TripReport tripReport) throws IOException {
