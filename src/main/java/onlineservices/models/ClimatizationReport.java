@@ -16,6 +16,13 @@ public class ClimatizationReport {
         this.actionCode = action;
     }
 
+    public ClimatizationReport() {
+        this.id = 0;
+        this.date = new Date();
+        this.power = 0;
+        this.actionCode = 0;
+    }
+
     public static short getNumberOfReports() {
         return numberOfReports;
     }

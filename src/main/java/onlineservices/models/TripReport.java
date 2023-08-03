@@ -19,6 +19,54 @@ public class TripReport {
         this.sosEmailSent = sosEmailSent;
     }
 
+    public TripReport(){
+        this.tripCoordinates = new ArrayList<>();
+        this.startTripDate = new Date();
+        this.endTripDate = new Date();
+        this.status = Status.COMPLETE;
+        this.sosEmailSent = false;
+    }
+
+    public List<String> getTripCoordinates() {
+        return tripCoordinates;
+    }
+
+    public void setTripCoordinates(List<String> tripCoordinates) {
+        this.tripCoordinates = tripCoordinates;
+    }
+
+    public Date getStartTripDate() {
+        return startTripDate;
+    }
+
+    public void setStartTripDate(Date startTripDate) {
+        this.startTripDate = startTripDate;
+    }
+
+    public Date getEndTripDate() {
+        return endTripDate;
+    }
+
+    public void setEndTripDate(Date endTripDate) {
+        this.endTripDate = endTripDate;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public boolean isSosEmailSent() {
+        return sosEmailSent;
+    }
+
+    public void setSosEmailSent(boolean sosEmailSent) {
+        this.sosEmailSent = sosEmailSent;
+    }
+
     @Override
     public String toString() {
         return "TripReport \n" +
