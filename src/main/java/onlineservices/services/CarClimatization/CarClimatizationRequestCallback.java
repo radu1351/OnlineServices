@@ -6,12 +6,14 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.io.IOException;
+
 public class CarClimatizationRequestCallback implements MqttCallback {
     private CarClimatizationHandler carClimatizationHandler = new CarClimatizationHandler(20);
     private static final Logger LOGGER = LogManager.getLogger(CarClimatizationRequestCallback.class);
 
     @Override
-    public void messageArrived(String s, MqttMessage mqttMessage){
+    public void messageArrived(String s, MqttMessage mqttMessage) throws IOException {
         LOGGER.info("Received car climatization value:" + mqttMessage.toString());
         carClimatizationHandler.processTemperature(mqttMessage.toString());
     }
