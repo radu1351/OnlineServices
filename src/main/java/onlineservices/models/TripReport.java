@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 public class TripReport {
+
+    private static short numberOfReports = 0;
+    private short id;
     private List<String> tripCoordinates;
     private Date startTripDate;
     private Date endTripDate;
@@ -12,6 +15,7 @@ public class TripReport {
     private boolean sosEmailSent;
 
     public TripReport(List<String> tripCoordinates, Date startTripDate, Date endTripDate, Status status, boolean sosEmailSent) {
+        this.id = ++numberOfReports;
         this.tripCoordinates = tripCoordinates;
         this.startTripDate = startTripDate;
         this.endTripDate = endTripDate;
@@ -19,7 +23,7 @@ public class TripReport {
         this.sosEmailSent = sosEmailSent;
     }
 
-    public TripReport(){
+    public TripReport() {
         this.tripCoordinates = new ArrayList<>();
         this.startTripDate = new Date();
         this.endTripDate = new Date();
@@ -67,13 +71,29 @@ public class TripReport {
         this.sosEmailSent = sosEmailSent;
     }
 
+    public static short getNumberOfReports() {
+        return numberOfReports;
+    }
+
+    public static void setNumberOfReports(short numberOfReports) {
+        TripReport.numberOfReports = numberOfReports;
+    }
+
+    public short getId() {
+        return id;
+    }
+
+    public void setId(short id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "TripReport \n" +
-                "status: " + status + "\n" +
-                "startTripDate: " + startTripDate + "\n" +
-                "endTripDate: " + endTripDate + "\n" +
-                "coordinates: " + tripCoordinates + "\n" +
-                "sosEmailSent: " + sosEmailSent;
+        return "ReportId: " + id + "\n" +
+                " status: " + status + "\n" +
+                " startTripDate: " + startTripDate + "\n" +
+                " endTripDate: " + endTripDate + "\n" +
+                " coordinates: " + tripCoordinates + "\n" +
+                " sosEmailSent: " + sosEmailSent;
     }
 }
