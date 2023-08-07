@@ -65,7 +65,7 @@ public class ClimatizationReport {
 
     @Override
     public String toString() {
-        return "ReportID: " + id + "\nDate: " + date +
-                "\nAir Conditioning Power: " + power + "\nAction Code: " + actionCode;
+        return "ReportId: " + id + "\n Date: " + date +
+                "\n Air Conditioning Power: " + power + "\n Action Code: " + actionCode;
     }
 }
