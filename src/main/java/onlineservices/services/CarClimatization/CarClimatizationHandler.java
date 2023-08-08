@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import onlineservices.models.ClimatizationState;
 import onlineservices.models.ClimatizationReport;
 import onlineservices.utils.Utils;
+import org.apache.commons.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class CarClimatizationHandler {
     private int setTemperature;
-    private List<Integer> lastMinuteTemperature = new ArrayList<>(0);
+    private final List<Integer> lastMinuteTemperature = new ArrayList<>(0);
     private ClimatizationState climatizationState = ClimatizationState.OFF;
     private static final Logger LOGGER = LogManager.getLogger(CarClimatizationHandler.class);
 
@@ -42,24 +43,26 @@ public class CarClimatizationHandler {
                     LOGGER.info("Climatization has been turned OFF.");
                 } else {
                     int difference = setTemperature - lastMinuteTemperature.get(3);
-                    if (difference >= 0) {
+                    if (difference > 0) {
                         //Temperature decreased => start heating
-                        if (difference == 0) climatizationState = ClimatizationState.HEATING_0;
-                        if (difference > 0 && difference <= 2) climatizationState = ClimatizationState.HEATING_1;
+                        if (difference <= 2) climatizationState = ClimatizationState.HEATING_1;
                         if (difference >= 3 && difference <= 4) climatizationState = ClimatizationState.HEATING_2;
                         if (difference >= 5 && difference <= 6) climatizationState = ClimatizationState.HEATING_3;
                         if (difference >= 7 && difference <= 8) climatizationState = ClimatizationState.HEATING_4;
                         if (difference > 9) climatizationState = ClimatizationState.HEATING_5;
                         LOGGER.info("Heating ON - Level: " + climatizationState);
-                    } else {
+                    } else if (difference < 0) {
                         //Temperature increased => start cooling
-                        if (difference == 0) climatizationState = ClimatizationState.COOLING_0;
-                        if (difference >= -2 && difference < 0) climatizationState = ClimatizationState.COOLING_1;
+                        if (difference >= -2) climatizationState = ClimatizationState.COOLING_1;
                         if (difference >= -4 && difference <= -3) climatizationState = ClimatizationState.COOLING_2;
                         if (difference >= -6 && difference <= -5) climatizationState = ClimatizationState.COOLING_3;
                         if (difference >= -8 && difference <= -7) climatizationState = ClimatizationState.COOLING_4;
                         if (difference <= -9) climatizationState = ClimatizationState.COOLING_5;
                         LOGGER.info("Cooling ON - Level: " + climatizationState);
+                    } else {
+                        if (lastMinuteTemperature.get(2) > setTemperature)
+                            climatizationState = ClimatizationState.COOLING_0;
+                        else climatizationState = ClimatizationState.HEATING_0;
                     }
                 }
                 ClimatizationReport climatizationReport = new ClimatizationReport(new Date(),
@@ -73,9 +76,10 @@ public class CarClimatizationHandler {
         }
     }
 
+
     private void sendClimatizationReport(ClimatizationReport climatizationReport) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = null;
+        String jsonString;
         try {
             jsonString = mapper.writeValueAsString(climatizationReport);
         } catch (JsonProcessingException e) {
@@ -94,10 +98,7 @@ public class CarClimatizationHandler {
             osw.flush();
         }
 
-        // Check server's response
         int responseCode = conn.getResponseCode();
-        System.out.println("POST Response Code :: " + responseCode);
-
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String inputLine;
@@ -107,9 +108,9 @@ public class CarClimatizationHandler {
                 response.append(inputLine);
             }
             in.close();
-            System.out.println(response.toString());
+            LOGGER.info("POST Response: " + response);
         } else {
-            System.out.println("POST request failed");
+            LOGGER.info("POST request failed.");
         }
         conn.disconnect();
     }

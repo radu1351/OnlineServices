@@ -9,7 +9,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.io.IOException;
 
 public class CarClimatizationRequestCallback implements MqttCallback {
-    private CarClimatizationHandler carClimatizationHandler = new CarClimatizationHandler(20);
+    private final CarClimatizationHandler carClimatizationHandler = new CarClimatizationHandler(20);
     private static final Logger LOGGER = LogManager.getLogger(CarClimatizationRequestCallback.class);
 
     @Override

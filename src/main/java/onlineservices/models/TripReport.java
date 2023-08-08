@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 public class TripReport {
-
-    private static short numberOfReports = 0;
     private short id;
     private List<String> tripCoordinates;
     private Date startTripDate;
@@ -15,7 +13,6 @@ public class TripReport {
     private boolean sosEmailSent;
 
     public TripReport(List<String> tripCoordinates, Date startTripDate, Date endTripDate, Status status, boolean sosEmailSent) {
-        this.id = ++numberOfReports;
         this.tripCoordinates = tripCoordinates;
         this.startTripDate = startTripDate;
         this.endTripDate = endTripDate;
@@ -69,14 +66,6 @@ public class TripReport {
 
     public void setSosEmailSent(boolean sosEmailSent) {
         this.sosEmailSent = sosEmailSent;
-    }
-
-    public static short getNumberOfReports() {
-        return numberOfReports;
-    }
-
-    public static void setNumberOfReports(short numberOfReports) {
-        TripReport.numberOfReports = numberOfReports;
     }
 
     public short getId() {
