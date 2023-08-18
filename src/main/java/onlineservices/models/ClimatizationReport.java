@@ -3,14 +3,12 @@ package onlineservices.models;
 import java.util.Date;
 
 public class ClimatizationReport {
-    private static short numberOfReports = 0;
     private short id;
     private Date date;
     private short power;
     private short actionCode;
 
     public ClimatizationReport(Date date, short power, short action) {
-        this.id = ++numberOfReports;
         this.date = date;
         this.power = power;
         this.actionCode = action;
@@ -21,14 +19,6 @@ public class ClimatizationReport {
         this.date = new Date();
         this.power = 0;
         this.actionCode = 0;
-    }
-
-    public static short getNumberOfReports() {
-        return numberOfReports;
-    }
-
-    public static void setNumberOfReports(short numberOfReports) {
-        ClimatizationReport.numberOfReports = numberOfReports;
     }
 
     public short getId() {

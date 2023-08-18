@@ -15,14 +15,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
 
 public class CarGpsHandler {
+
+    private static final Logger LOGGER = LogManager.getLogger(CarGpsHandler.class);
     private static final String startingSignal = "-10000, -10000";
     private static final String endingSignal = "-10001, -10001";
     private static final String sosSignal = "-11111, -11111";
     private boolean hasTripStarted = false;
-    private List<String> tripCoordinates = new ArrayList<>();
+    private final List<String> tripCoordinates = new ArrayList<>();
     private Date startTripDate;
     private Date endTripDate;
     private Date lastCoordinatesDate;
@@ -30,7 +36,6 @@ public class CarGpsHandler {
     private boolean sosEmailSent = false;
     private String lastCoordinates;
     private int sosTrigger = 0;
-    private static final Logger LOGGER = LogManager.getLogger(CarGpsService.class);
 
     public void processCoordinates(String coordinates) throws IOException {
         if (coordinates.equals(startingSignal)) {
@@ -74,7 +79,7 @@ public class CarGpsHandler {
 
     private void sendSosData(String lastCoordinates, Date lastCoordinatesDate) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = null;
+        String jsonString;
 
         Map<String, Object> sosData = new HashMap<>();
         sosData.put("lastCoordinates", lastCoordinates);
@@ -99,9 +104,7 @@ public class CarGpsHandler {
             osw.flush();
         }
 
-        // Check server's response
         int responseCode = conn.getResponseCode();
-        System.out.println("POST Response Code :: " + responseCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -112,16 +115,16 @@ public class CarGpsHandler {
                 response.append(inputLine);
             }
             in.close();
-            System.out.println(response.toString());
+            LOGGER.info("POST Response: " + response);
         } else {
-            System.out.println("POST request failed");
+            LOGGER.info("POST Request failed. ");
         }
         conn.disconnect();
     }
 
     private void sendTripReport(TripReport tripReport) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = null;
+        String jsonString;
         try {
             jsonString = mapper.writeValueAsString(tripReport);
         } catch (JsonProcessingException e) {
@@ -140,10 +143,7 @@ public class CarGpsHandler {
             osw.flush();
         }
 
-        // Check server's response
         int responseCode = conn.getResponseCode();
-        System.out.println("POST Response Code :: " + responseCode);
-
         if (responseCode == HttpURLConnection.HTTP_OK) {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String inputLine;
@@ -153,9 +153,9 @@ public class CarGpsHandler {
                 response.append(inputLine);
             }
             in.close();
-            System.out.println(response.toString());
+            LOGGER.info("POST Response: " + response);
         } else {
-            System.out.println("POST request failed");
+            LOGGER.info("POST Request failed. ");
         }
         conn.disconnect();
     }
