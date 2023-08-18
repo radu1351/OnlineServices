@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import onlineservices.models.ClimatizationState;
 import onlineservices.models.ClimatizationReport;
 import onlineservices.utils.Utils;
-import org.apache.commons.logging.Log;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,34 +14,40 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class CarClimatizationHandler {
-    private int setTemperature;
+
+    private static final Logger LOGGER = LogManager.getLogger(CarClimatizationHandler.class);
+    private int currentTargetTemperature;
     private final List<Integer> lastMinuteTemperature = new ArrayList<>(0);
     private ClimatizationState climatizationState = ClimatizationState.OFF;
-    private static final Logger LOGGER = LogManager.getLogger(CarClimatizationHandler.class);
 
-    public CarClimatizationHandler(int setTemperature) {
-        this.setTemperature = setTemperature;
+    public CarClimatizationHandler() {
+        getTargetTemperatureFromServer();
     }
 
     public void processTemperature(String temperature) throws IOException {
         if (temperature.contains("set")) {
-            this.setTemperature = Integer.parseInt(temperature.split(" ")[1]);
-            LOGGER.info("Set temperature to " + setTemperature);
+            this.currentTargetTemperature = Integer.parseInt(temperature.split(" ")[1]);
+            sendTargetTemperatureToServer();
+            LOGGER.info("Set temperature to " + currentTargetTemperature);
         } else {
             lastMinuteTemperature.add(Integer.parseInt(temperature));
             if (lastMinuteTemperature.size() == 4) {
-                if (Utils.areNumbersEqual(lastMinuteTemperature) && lastMinuteTemperature.get(0).equals(setTemperature)) {
+                if (Utils.areNumbersEqual(lastMinuteTemperature) && lastMinuteTemperature.get(0).equals(currentTargetTemperature)) {
                     climatizationState = ClimatizationState.OFF;
                     LOGGER.info("Climatization has been turned OFF.");
                 } else {
-                    int difference = setTemperature - lastMinuteTemperature.get(3);
+                    int difference = currentTargetTemperature - lastMinuteTemperature.get(3);
                     if (difference > 0) {
                         //Temperature decreased => start heating
                         if (difference <= 2) climatizationState = ClimatizationState.HEATING_1;
@@ -60,7 +65,7 @@ public class CarClimatizationHandler {
                         if (difference <= -9) climatizationState = ClimatizationState.COOLING_5;
                         LOGGER.info("Cooling ON - Level: " + climatizationState);
                     } else {
-                        if (lastMinuteTemperature.get(2) > setTemperature)
+                        if (lastMinuteTemperature.get(2) > currentTargetTemperature)
                             climatizationState = ClimatizationState.COOLING_0;
                         else climatizationState = ClimatizationState.HEATING_0;
                     }
@@ -113,5 +118,61 @@ public class CarClimatizationHandler {
             LOGGER.info("POST request failed.");
         }
         conn.disconnect();
+    }
+
+    public void sendTargetTemperatureToServer() throws IOException {
+        URL url = new URL("http://localhost:8080/receive_target_temperature_from_climatization_service");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "text/plain");
+        conn.setDoOutput(true);
+        String intString = String.valueOf(currentTargetTemperature);
+        try (OutputStream os = conn.getOutputStream()) {
+            OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8);
+            osw.write(intString);
+            osw.flush();
+        }
+
+        int responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            LOGGER.info("POST Response: " + response);
+        } else {
+            LOGGER.info("POST request failed.");
+        }
+        conn.disconnect();
+    }
+
+
+    private void getTargetTemperatureFromServer() {
+        try {
+            URL url = new URL("http://localhost:8080/get_target_temperature");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                this.currentTargetTemperature = Integer.parseInt(response.toString());
+                LOGGER.info("Loaded target temperature from server: " + currentTargetTemperature);
+            } else {
+                LOGGER.info("GET request failed while loading target temperature from server: " + responseCode);
+            }
+        } catch (Exception exception) {
+            LOGGER.error(exception.toString());
+        }
     }
 }

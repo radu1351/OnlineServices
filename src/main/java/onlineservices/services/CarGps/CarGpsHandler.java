@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.List;
 
 public class CarGpsHandler {
+
+    private static final Logger LOGGER = LogManager.getLogger(CarGpsHandler.class);
     private static final String startingSignal = "-10000, -10000";
     private static final String endingSignal = "-10001, -10001";
     private static final String sosSignal = "-11111, -11111";
@@ -34,7 +36,6 @@ public class CarGpsHandler {
     private boolean sosEmailSent = false;
     private String lastCoordinates;
     private int sosTrigger = 0;
-    private static final Logger LOGGER = LogManager.getLogger(CarGpsHandler.class);
 
     public void processCoordinates(String coordinates) throws IOException {
         if (coordinates.equals(startingSignal)) {
